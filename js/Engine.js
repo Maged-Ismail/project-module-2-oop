@@ -49,7 +49,7 @@ class Engine {
             this.scoreUp = 0;
             lives = 3;
             this.life.update();
-            MAX_ENEMIES = 5;
+            MAX_ENEMIES = 7;
             this.loop = 20;
             this.score.update(this.scoreUp);
             this.level.raise(Math.round(this.levelCount));
@@ -77,23 +77,28 @@ class Engine {
         // this.isBonusTaken();
         
         // More Ennemies every 2 weeks
-        if (this.levelCount % 2 === 0) {
-            MAX_ENEMIES ++;
-            console.log(MAX_ENEMIES);
+        if (this.scoreUp % 100 === 0) {
+            if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
+                setTimeout(() => {
+                    warningSound.play();}, 1500);
+                MAX_ENEMIES ++;
+                console.log(MAX_ENEMIES);
         }
+    }
         //Ennemies faster every 3 weeks
-        if (this.levelCount % 3 === 0) {
-            this.loop -= 2;
+        if (this.scoreUp % 150 === 0) {
+            if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
+            this.loop -= 0.25;
             console.log(this.loop);
         }
+    }
 
-        if (this.levelCount === 13){
+        if (this.scoreUp > 600){
             playing = false;
             gameMusic.pause();
             completedSound.play();
             document.removeEventListener("keydown", keydownHandler);
-            window.alert("Game Over");
-
+            // window.alert("Game Over");
         }
     }
         setTimeout(this.gameLoop, this.loop);  
@@ -115,6 +120,7 @@ class Engine {
         });
 
         if (lives === 0){
+            goodbyeSound.play();
             dead = true;
     }
         return dead;

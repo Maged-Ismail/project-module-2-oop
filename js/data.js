@@ -4,7 +4,7 @@ const GAME_HEIGHT = 550;
 
 const ENEMY_WIDTH = 75;
 const ENEMY_HEIGHT = 75;
-let MAX_ENEMIES = 8;
+let MAX_ENEMIES = 7;
 
 const PLAYER_WIDTH = 75;
 const PLAYER_HEIGHT = 75;
@@ -18,6 +18,7 @@ let lives = 3;
 ////New Sounds
 let gameMusic = new Audio('./sounds/wreck1.mp3');
 document.getElementById('app').appendChild(gameMusic);
+gameMusic.loop=true;
 
 let playerMoveSound = new Audio('./sounds/pmove.mp3');
 document.getElementById('app').appendChild(playerMoveSound);
@@ -30,6 +31,15 @@ document.getElementById('app').appendChild(failSound);
 
 let completedSound = new Audio('./sounds/completed.mp3');
 document.getElementById('app').appendChild(completedSound);
+
+let welcomeSound = new Audio('./sounds/welcome.mp3');
+document.getElementById('app').appendChild(welcomeSound);
+
+let warningSound = new Audio('./sounds/warning.mp3');
+document.getElementById('app').appendChild(warningSound);
+
+let goodbyeSound = new Audio('./sounds/goodbye.mp3');
+document.getElementById('app').appendChild(goodbyeSound);
 
 //New Entity Class
 class Entity {
@@ -180,6 +190,7 @@ class Start {
         gameMusic.currentTime=0;
         this.button.removeEventListener('click', startF);
         this.page.style.display = 'none';
+        welcomeSound.play();
         gameMusic.play();
         startGame();
     }
