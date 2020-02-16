@@ -1,7 +1,7 @@
 // The Enemy class will contain information about the enemy such as
 // its position on screen. It will also provide methods for updating
 // and destroying the enemy.
-class Enemy {
+class Enemy extends Entity {
     // The constructor takes 2 arguments.
     // - theRoot refers to the parent DOM element.
     //   We need a way to add the DOM element we create in this constructor to our DOM.
@@ -10,6 +10,7 @@ class Enemy {
     // and the 2 parameters provide important information, we must supply 2 arguments to "new" every time we
     // create an instance of this class.
     constructor(theRoot, enemySpot) {
+        super();
         // When we create an Enemy instance, for example, new Enemy(someRoot, 3)
         // A new object is created and the constructor of the Enemy class is called. The context (the \`this\` keyword) is going
         // to be the new object. In these lines of code we see how to add 2 properties to this object: spot, root and gameHeight.
@@ -30,16 +31,9 @@ class Enemy {
         // We create a new DOM element. The tag of this DOM element is img. It is the DOM node that will display the enemy image
         // to the user. When the enemy is no longer needed, we will use a reference to this DOM node to remove it from the game. This
         // is why we create a property that refers to it.
-        this.domElement = document.createElement('img');
-        // We give it a src attribute to specify which image to display.
-        this.domElement.src = './images/enemy.png';
-        // We modify the CSS style of the DOM node.
-        this.domElement.style.position = 'absolute';
-        this.domElement.style.left = `${this.x}px`;
-        this.domElement.style.top = `${this.y}px`;
-        this.domElement.style.zIndex = 5;
-        // Show that the user can actually see the img DOM node, we append it to the root DOM node.
-        theRoot.appendChild(this.domElement);
+        let src = './images/folder.png';
+        this.render(src, this.x, this.y, '5');
+
         this.speed = Math.random() / 2 + 0.25;
     }
 

@@ -1,3 +1,4 @@
+
 // In this file we have functions that will be used in the Engine.js file.
 // nextEnemySpot is a variable that refers to a function. The function has one parameter,
 // which we called enemies. enemies will refer to an array that will contain instances of the
@@ -39,7 +40,7 @@ const addBackground = root => {
     // We create a new img DOM node.
     const bg = document.createElement("img");
     // We set its src attribute and the height and width CSS attributes
-    bg.src = 'images/stars.png';
+    bg.src = 'images/classroom.jpg';
     bg.style.height = `${GAME_HEIGHT}px`;
     bg.style.width = `${GAME_WIDTH}px`;
     // We add it to the root DOM node
@@ -51,9 +52,10 @@ const addBackground = root => {
     // We put a high z-index so that the div is placed over all other DOM nodes
     whiteBox.style.zIndex = 100;
     whiteBox.style.position = 'absolute';
-    whiteBox.style.top = `${GAME_HEIGHT}px`;
+    whiteBox.style.top = `${GAME_HEIGHT+10}px`;
     whiteBox.style.height = `${ENEMY_HEIGHT}px`;
     whiteBox.style.width = `${GAME_WIDTH}px`;
     whiteBox.style.background = '#fff';
     root.append(whiteBox);
 }
+
