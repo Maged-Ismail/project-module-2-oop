@@ -41,6 +41,12 @@ document.getElementById('app').appendChild(warningSound);
 let goodbyeSound = new Audio('./sounds/goodbye.mp3');
 document.getElementById('app').appendChild(goodbyeSound);
 
+let levelUpSound = new Audio('./sounds/levelup2.mp3');
+document.getElementById('app').appendChild(levelUpSound);
+
+let incomingSound = new Audio('./sounds/incoming.mp3');
+document.getElementById('app').appendChild(incomingSound);
+
 //New Entity Class
 class Entity {
     render(source, x, y, z) {
@@ -164,24 +170,24 @@ class Start {
         this.button.style.padding= '25px 50px';
         this.button.style.backgroundColor= 'grey';
         this.button.style.border = '5px solid black'
-        this.button.style.color= 'gold';
+        this.button.style.color= 'white';
         this.button.style.fontSize = '2rem';
         this.button.addEventListener('click', startF);
         this.title = document.createElement('h1');
         this.title.innerText = 'THE BOOTCAMP';
         this.page.appendChild(this.title);
         this.title.style.position = 'absolute';
-        this.title.style.bottom = '75px';
+        this.title.style.bottom = '120px';
         this.title.style.left= '200px';
         this.title.style.fontSize = '6.5rem';
         this.title.style.color= 'red';
         this.par = document.createElement('p');
         this.par.innerText = '\"Use the Arrow Keys to Survive \n12 Weeks of Endless Workshops\"';
         this.page.appendChild(this.par);
-        this.par.style.fontSize='1.85rem';
+        this.par.style.fontSize='1.05rem';
         this.par.style.position = 'absolute';
-        this.par.style.top = '220px';
-        this.par.style.left= '400px';
+        this.par.style.top = '240px';
+        this.par.style.left= '510px';
         this.par.style.color = 'black';
         this.par.style.fontStyle = 'italic';
     }
@@ -200,8 +206,8 @@ class Start {
         this.page.style.top = '0';
         this.page.style.zIndex = '500';
         this.title.innerText = 'YOU FAILED!!!';
-        this.title.style.bottom = '50px';
-        this.title.style.left = '250px';
+        this.title.style.bottom = '20px';
+        this.title.style.left = '180px';
         this.button.innerText= 'RESTART';
         this.button.style.left = '495px';
         this.par.style.display = 'none';

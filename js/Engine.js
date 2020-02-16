@@ -71,7 +71,7 @@ class Engine {
             this.levelCount += 0.05;
             // console.log(this.levelCount);
             this.level.raise(Math.round(this.levelCount));
-            lvlUpSound.play();
+            levelUpSound.play();
             // this.bonuses.push(new Bonus(appRoot));
         }
         // this.isBonusTaken();
@@ -80,7 +80,7 @@ class Engine {
         if (this.scoreUp % 100 === 0) {
             if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
                 setTimeout(() => {
-                    warningSound.play();}, 1500);
+                    incomingSound.play();}, 500);
                 MAX_ENEMIES ++;
                 console.log(MAX_ENEMIES);
         }
@@ -89,6 +89,8 @@ class Engine {
         if (this.scoreUp % 150 === 0) {
             if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
             this.loop -= 0.25;
+            setTimeout(() => {
+                warningSound.play();}, 500);
             console.log(this.loop);
         }
     }
@@ -119,7 +121,7 @@ class Engine {
         }
         });
 
-        if (lives === 0){
+        if (lives <= 0){
             goodbyeSound.play();
             dead = true;
     }
