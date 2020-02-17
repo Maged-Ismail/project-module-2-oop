@@ -48,7 +48,10 @@ class Engine {
             this.levelCount = 1;
             this.scoreUp = 0;
             lives = 3;
-            this.life.update();
+            cups = 0;
+            // this.bonuses =[];
+            this.life.updateLives();
+            this.life.updateBonus();
             MAX_ENEMIES = 7;
             this.loop = 20;
             this.score.update(this.scoreUp);
@@ -72,9 +75,31 @@ class Engine {
             // console.log(this.levelCount);
             this.level.raise(Math.round(this.levelCount));
             levelUpSound.play();
-            // this.bonuses.push(new Bonus(appRoot));
+            if (this.timeCounter % 3 === 0 && this.timeCounter > 4){
+                brewSound.play();
+            this.bonuses.push(new Bonus(this.root));
+            this.life.updateBonus();
+            // console.log(this.bonuses);
+            // console.log(this.enemies);
         }
-        // this.isBonusTaken();
+    }
+
+        //Bonus Array Check
+        this.life.updateBonus();
+        this.bonuses.forEach(bonus => {bonus.update(this.player.x, this.player.y);});
+        this.bonuses = this.bonuses.filter(bonus => {
+            return !bonus.taken;
+        });
+
+        //Extra Life
+        if (cups === 5) {
+            cups = 0;
+            lives ++;
+            lifeSound.play();
+            this.life.updateLives();
+            this.life.updateBonus();
+        }
+        
         
         // More Ennemies every 2 weeks
         if (this.scoreUp % 100 === 0) {
@@ -90,11 +115,11 @@ class Engine {
             if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
             this.loop -= 0.25;
             setTimeout(() => {
-                warningSound.play();}, 500);
+                warningSound.play();}, 300);
             console.log(this.loop);
         }
     }
-
+        //Game Ends After 12 Weeks
         if (this.scoreUp > 600){
             playing = false;
             gameMusic.pause();
@@ -111,11 +136,11 @@ class Engine {
         // let playerY= GAME_HEIGHT - PLAYER_HEIGHT - 10;
         this.enemies.forEach((enemyArr) => {
             
-            if ((enemyArr.x +5 >= this.player.x && enemyArr.x +5 <= (this.player.x+PLAYER_WIDTH)) && ((enemyArr.y+ENEMY_HEIGHT +10 ) >= this.player.y && (enemyArr.y+ENEMY_HEIGHT +10)<= this.player.y+PLAYER_HEIGHT)){
+            if ((enemyArr.x +5 >= this.player.x && enemyArr.x +5  <= (this.player.x+PLAYER_WIDTH)) && ((enemyArr.y+ENEMY_HEIGHT +10 ) >= this.player.y && (enemyArr.y+ENEMY_HEIGHT +10)<= this.player.y+PLAYER_HEIGHT)){
                 if (this.timeCounter % 5 === 0){
                     failSound.play();
                     lives = lives-1;
-                    this.life.update();
+                    this.life.updateLives();
                     this.player.initialize();
             }
         }

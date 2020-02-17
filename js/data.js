@@ -4,7 +4,7 @@ const GAME_HEIGHT = 550;
 
 const ENEMY_WIDTH = 75;
 const ENEMY_HEIGHT = 75;
-let MAX_ENEMIES = 7;
+let MAX_ENEMIES = 6;
 
 const PLAYER_WIDTH = 75;
 const PLAYER_HEIGHT = 75;
@@ -14,6 +14,7 @@ const PLAYER_HEIGHT = 75;
 let playing = true;
 appRoot=document.getElementById("app");
 let lives = 3;
+let cups = 0;
 
 ////New Sounds
 let gameMusic = new Audio('./sounds/wreck1.mp3');
@@ -47,6 +48,15 @@ document.getElementById('app').appendChild(levelUpSound);
 let incomingSound = new Audio('./sounds/incoming.mp3');
 document.getElementById('app').appendChild(incomingSound);
 
+let brewSound = new Audio('./sounds/brew2.mp3');
+document.getElementById('app').appendChild(brewSound);
+
+let drinkSound = new Audio('./sounds/drink.mp3');
+document.getElementById('app').appendChild(drinkSound);
+
+let lifeSound = new Audio('./sounds/newlife.mp3');
+document.getElementById('app').appendChild(lifeSound);
+
 //New Entity Class
 class Entity {
     render(source, x, y, z) {
@@ -56,23 +66,37 @@ class Entity {
         this.domElement.style.left = `${x}px`;
         this.domElement.style.top =` ${y}px`;
         this.domElement.style.zIndex = z;
-        document.getElementById('app').appendChild(this.domElement);
+        appRoot.appendChild(this.domElement);
     }
 }
 
 //New Bonus Class
 class Bonus extends Entity {
     
-    constructor(root) {
+    constructor(theRoot) {
         super();
-        this.x = Math.round(Math.random()*(GAME_WIDTH-10));
-        this.y = Math.round(Math.random()*(GAME_HEIGHT-10));
+        this.root = theRoot;
+        this.taken = false;
+        this.x = 60+ Math.round(Math.random()*(GAME_WIDTH-150));
+        this.y = 60+ Math.round(Math.random()*(GAME_HEIGHT-150));
         let src= 'images/coffee.png';
         this.render(src, this.x, this.y, '3');
-        // this.domElement.id = 'bonus';
+
     }
-    remove(){
-        appRoot.removeChild(this.domElement);
+    update(px,py){
+        if ((this.x <= (px +85) && this.x >= (px)) && (this.y <= (py+85) && (this.y) >= (py))) {
+            drinkSound.play();
+            this.taken = true;
+            px=0;
+            py=0;
+            this.domElement.style.left = '0';
+            this.domElement.style.top = '0';
+            this.domElement.style.display= 'none';
+            cups ++;
+            return;
+            console.log(cups);
+            // this.root.removeChild(this.domElement);
+        }
     }
 }
 
@@ -92,6 +116,7 @@ class Score {
         this.scoreBox.style.fontWeight= 'bold';
         this.scoreBox.style.maxWidth = '350px';
         this.scoreBox.style.overflow ='none';
+        this.scoreBox.style.zIndex ='25';
     }
     update(score) {
         this.scoreBox.innerText = `Score: ${score}`;
@@ -109,10 +134,11 @@ class Level {
         this.levelBox.style.left= '455px';
         this.levelBox.style.fontSize='3.5rem';
         this.levelBox.style.opacity = '0.75';
-        this.levelBox.style.color = 'red';
+        this.levelBox.style.color = 'darkred';
         this.levelBox.style.fontWeight= 'bold';
         this.levelBox.style.maxWidth = '250px';
         this.levelBox.style.overflow ='none';
+        this.levelBox.style.zIndex ='25';
     }
     raise(lvl) {
         this.levelBox.innerText = `Week ${lvl}`;
@@ -129,6 +155,7 @@ class Lives {
         this.livesSymb.style.position = 'absolute';
         this.livesSymb.style.top = '57.5px';
         this.livesSymb.style.right= '145px';
+        this.livesSymb.style.zIndex= '25';
         this.livesBox = document.createElement('div');
         this.livesBox.innerText = `: ${lives}`;
         appRoot.appendChild(this.livesBox);
@@ -142,9 +169,35 @@ class Lives {
         this.livesBox.style.fontWeight= 'bold';
         this.livesBox.style.maxWidth = '350px';
         this.livesBox.style.overflow ='none';
+        this.livesBox.style.zIndex ='25';
+        this.bonusSymb = document.createElement('img');
+        this.bonusSymb.src = 'images/coffee.png';
+        appRoot.appendChild(this.bonusSymb);
+        this.bonusSymb.style.maxWidth='30px';
+        this.bonusSymb.style.position = 'absolute';
+        this.bonusSymb.style.top = '107.5px';
+        this.bonusSymb.style.right= '150px';
+        this.bonusSymb.style.zIndex= '25';
+        this.bonusBox = document.createElement('div');
+        this.bonusBox.innerText = `: ${cups}`;
+        appRoot.appendChild(this.bonusBox);
+        this.bonusBox.style.position = 'absolute';
+        this.bonusBox.style.top = '105px';
+        this.bonusBox.style.right= '78.5px';
+        this.bonusBox.style.fontSize='2.5rem';
+        this.bonusBox.style.color = 'white';
+        this.bonusBox.style.opacity = '0.85';
+        this.bonusBox.style.color = 'lightred';
+        this.bonusBox.style.fontWeight= 'bold';
+        this.bonusBox.style.maxWidth = '350px';
+        this.bonusBox.style.overflow ='none';
+        this.bonusBox.style.zIndex ='25';
     }
-    update() {
+    updateLives() {
         this.livesBox.innerText = `: ${lives}`;
+    }
+    updateBonus() {
+        this.bonusBox.innerText = `: ${cups}`;
     }
 }
 
@@ -178,15 +231,15 @@ class Start {
         this.page.appendChild(this.title);
         this.title.style.position = 'absolute';
         this.title.style.bottom = '120px';
-        this.title.style.left= '200px';
+        this.title.style.left= '180px';
         this.title.style.fontSize = '6.5rem';
-        this.title.style.color= 'red';
+        this.title.style.color= 'darkred';
         this.par = document.createElement('p');
-        this.par.innerText = '\"Use the Arrow Keys to Survive \n12 Weeks of Endless Workshops\"';
+        this.par.innerText = '\"Use the Arrow Keys to Survive \n12 Weeks of Endless Workshops.\n Coffee is your friend! Earn \nan Extra Life with Every 5 Cups.\"';
         this.page.appendChild(this.par);
         this.par.style.fontSize='1.05rem';
         this.par.style.position = 'absolute';
-        this.par.style.top = '240px';
+        this.par.style.top = '230px';
         this.par.style.left= '510px';
         this.par.style.color = 'black';
         this.par.style.fontStyle = 'italic';
@@ -208,8 +261,8 @@ class Start {
         this.title.innerText = 'YOU FAILED!!!';
         this.title.style.bottom = '20px';
         this.title.style.left = '180px';
-        this.button.innerText= 'RESTART';
-        this.button.style.left = '495px';
+        this.button.innerText= 'RETRY';
+        this.button.style.left = '505px';
         this.par.style.display = 'none';
         this.button.addEventListener('click', restartF);
     }
