@@ -1,64 +1,171 @@
-// The engine class will only be instantiated once. It contains all the logic
-// of the game relating to the interactions between the player and the
-// enemy and also relating to how our enemies are created and evolve over time
+
 class Engine {
-    // The constructor has one parameter. It will refer to the DOM node that we will be adding everything to.
-    // You need to provide the DOM node when you create an instance of the class
+
     constructor(theRoot) {
-        // We need the DOM element every time we create a new enemy so we
-        // store a reference to it in a property of the instance.
         this.root = theRoot;
-        // We create our hamburger.
-        // Please refer to Player.js for more information about what happens when you create a player
         this.player = new Player(this.root);
-        // Initially, we have no enemies in the game. The enemies property refers to an array
-        // that contains instances of the Enemy class
         this.enemies = [];
-        // We add the background image to the game
         addBackground(this.root);
+
+        this.bonuses =[];
+        this.life = new Lives();
+        this.score = new Score();
+        this.scoreUp = 0;
+        this.scoreInc = 1;
+        this.timeCounter = 0;
+        this.level = new Level();
+        this.levelCount = 1;
+        this.loop = 20;
+        let i =0;
+        
     }
 
-    // The gameLoop will run every few milliseconds. It does several things
-    //  - Updates the enemy positions
-    //  - Detects a collision between the player and any enemy
-    //  - Removes enemies that are too low from the enemies array
     gameLoop = () => {
-        // This code is to see how much time, in milliseconds, has elapsed since the last
-        // time this method was called.
-        // (new Date).getTime() evaluates to the number of milliseconds since January 1st, 1970 at midnight.
+    if (playing === true){
         if (this.lastFrame === undefined) this.lastFrame = (new Date).getTime();
         let timeDiff = (new Date).getTime() - this.lastFrame;
         this.lastFrame = (new Date).getTime();
-        // We use the number of milliseconds since the last call to gameLoop to update the enemy positions.
-        // Furthermore, if any enemy is below the bottom of our game, its destroyed property will be set. (See Enemy.js)
         this.enemies.forEach(enemy => {
             enemy.update(timeDiff);
         });
-        // We remove all the destroyed enemies from the array referred to by \`this.enemies\`.
-        // We use filter to accomplish this.
-        // Remember: this.enemies only contains instances of the Enemy class.
         this.enemies = this.enemies.filter(enemy => {
             return !enemy.destroyed;
         });
-        // We need to perform the addition of enemies until we have enough enemies.
         while (this.enemies.length < MAX_ENEMIES) {
-            // We find the next available spot and, using this spot, we create an enemy.
-            // We add this enemy to the enemies array 
             const spot = nextEnemySpot(this.enemies);
             this.enemies.push(new Enemy(this.root, spot));
         }
-        // We check if the player is dead. If he is, we alert the user
-        // and return from the method (Why is the return statement important?)
+
         if (this.isPlayerDead()) {
-            window.alert("Game over");
-            return;
+            failSound.play();
+            playing = false;
+            gameMusic.pause();
+            this.player.initialize();
+            document.removeEventListener("keydown", keydownHandler);
+            starter.restartPage();
+            this.lastFrame = (new Date).getTime();
+            this.timeCounter = 0;
+            this.levelCount = 1;
+            this.scoreUp = 0;
+            lives = 3;
+            cups = 0;
+            // this.bonuses =[];
+            this.life.updateLives();
+            this.life.updateBonus();
+            MAX_ENEMIES = 7;
+            this.loop = 20;
+            this.score.update(this.scoreUp);
+            this.level.raise(Math.round(this.levelCount));
+            // window.alert("Fail!");
+            // document.removeEventListener("keydown", keydownHandler);
+            // return;
         }
-        // If the player is not dead, then we put a setTimeout to run the gameLoop in 20 milliseconds
-        setTimeout(this.gameLoop, 20);
+
+        this.timeCounter += 1;
+        
+        //Score Count
+        if (this.timeCounter % 20 === 0 && this.timeCounter > 10){
+        this.scoreUp +=  this.scoreInc;
+        this.score.update(this.scoreUp);
+        }
+
+        //Week Count (level Up)
+        if (this.scoreUp % 50 === 0 && this.scoreUp >1){
+            this.levelCount += 0.05;
+            // console.log(this.levelCount);
+            this.level.raise(Math.round(this.levelCount));
+            levelUpSound.play();
+            if (this.timeCounter % 3 === 0 && this.timeCounter > 4){
+                brewSound.play();
+            this.bonuses.push(new Bonus(this.root));
+            this.life.updateBonus();
+            // console.log(this.bonuses);
+            // console.log(this.enemies);
+        }
     }
-    // This method is not implemented correctly, which is why
-    // the burger never dies. In your exercises you will fix this method.
+
+        //Bonus Array Check
+        this.life.updateBonus();
+        this.bonuses.forEach(bonus => {bonus.update(this.player.x, this.player.y);});
+        this.bonuses = this.bonuses.filter(bonus => {
+            return !bonus.taken;
+        });
+
+        //Extra Life
+        if (cups === 5) {
+            cups = 0;
+            lives ++;
+            lifeSound.play();
+            this.life.updateLives();
+            this.life.updateBonus();
+        }
+        
+        
+        // More Ennemies every 2 weeks
+        if (this.scoreUp % 100 === 0) {
+            if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
+                setTimeout(() => {
+                    incomingSound.play();}, 500);
+                MAX_ENEMIES ++;
+                console.log(MAX_ENEMIES);
+        }
+    }
+        //Ennemies faster every 3 weeks
+        if (this.scoreUp % 150 === 0) {
+            if (this.timeCounter % 15 === 0 && this.timeCounter > 15){
+            this.loop -= 0.25;
+            setTimeout(() => {
+                warningSound.play();}, 300);
+            console.log(this.loop);
+        }
+    }
+        //Game Ends After 12 Weeks
+        if (this.scoreUp > 600){
+            playing = false;
+            gameMusic.pause();
+            completedSound.play();
+            document.removeEventListener("keydown", keydownHandler);
+            // window.alert("Game Over");
+        }
+    }
+        setTimeout(this.gameLoop, this.loop);  
+    }
+
     isPlayerDead = () => {
-        return false;
+        let dead = false;
+        // let playerY= GAME_HEIGHT - PLAYER_HEIGHT - 10;
+        this.enemies.forEach((enemyArr) => {
+            
+            if ((enemyArr.x +5 >= this.player.x && enemyArr.x +5  <= (this.player.x+PLAYER_WIDTH)) && ((enemyArr.y+ENEMY_HEIGHT +10 ) >= this.player.y && (enemyArr.y+ENEMY_HEIGHT +10)<= this.player.y+PLAYER_HEIGHT)){
+                if (this.timeCounter % 5 === 0){
+                    failSound.play();
+                    lives = lives-1;
+                    this.life.updateLives();
+                    this.player.initialize();
+            }
+        }
+        });
+
+        if (lives <= 0){
+            goodbyeSound.play();
+            dead = true;
+    }
+        return dead;
     }
 }
+
+//     isBonusTaken = () => {
+//         // let drink = false;
+        
+//         this.bonuses.forEach((bonusElem) => {
+//             if ((bonusElem.x <= (this.player.x +37.5) && (bonusElem.x+37.5) >= (this.player.x +37.5)) && (bonusElem.y <= (this.player.y+37.5) && (bonusElem.y+37.5) >= (this.player.y+37.5))) {
+//                 console.log("Bonus");                
+//                 bonusElem.remove();
+//                 // let bonusElemClass = document.getElementById('bonus');
+//                 // appRoot.removeChild(bonusElemClass);
+//                 // drink = true;
+//             }
+//         });
+//         // return drink;
+//     }
+// }
